@@ -24,7 +24,7 @@
 #define HE_Undefined 8
 #define HE_NoPlayerChar 9
 
-#define MAX_LIST_ITEMS 1605
+#define MAX_LIST_ITEMS 3000
 
 struct SCore;
 struct SEquipBuffer;
