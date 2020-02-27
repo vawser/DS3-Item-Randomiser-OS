@@ -88,8 +88,8 @@ BOOL CCore::Initialise() {
 	CoreStruct->dLockEquipSlots = reader.GetBoolean("AutoEquip", "LockEquipSlots", false);
 	CoreStruct->dIsNoWeaponRequirements = reader.GetBoolean("AutoEquip", "NoWeaponRequirements", false);
 
-	CoreStruct->pOffsetArray = (DWORD*)HeapAlloc(CoreStruct->hHeap, 8, 0x6000);
-	CoreStruct->pItemArray = (DWORD*)HeapAlloc(CoreStruct->hHeap, 8, 0x6000);
+	CoreStruct->pOffsetArray = (DWORD*)HeapAlloc(CoreStruct->hHeap, 8, 0x3000);
+	CoreStruct->pItemArray = (DWORD*)HeapAlloc(CoreStruct->hHeap, 8, 0x3000);
 
 	if ((!CoreStruct->pItemArray) || (!CoreStruct->pOffsetArray)) {
 		Core->Panic("Out of memory", "...\\Randomiser\\Core\\Core.cpp", FE_MemError, 1);
@@ -115,7 +115,8 @@ BOOL CCore::Initialise() {
 
 	GetArrayList();
 
-	while (!CoreStruct->pOffsetArray[i]) {
+	while (!CoreStruct->pOffsetArray[i + 1]) {
+		if (CoreStruct->pOffsetArray[0] == i) break;
 		CoreStruct->pItemArray[0]++;
 		i++;
 	}; 
@@ -137,49 +138,57 @@ BOOL CCore::Initialise() {
 
 BOOL CCore::GetArrayList() {
 
-	int i = 0;
+	DWORD i = 0;
 
-	std::ifstream readfileA("DS3RandomAoB.txt");
-	std::ifstream readfileB("DS3ItemAoB.txt");
+	std::ifstream readfileA("Data_Item_Order.txt");
+	std::ifstream readfileB("Data_Item_List.txt");
+
+	DWORD* pOffsetList = CoreStruct->pOffsetArray;
+	DWORD* pItemList = CoreStruct->pItemArray;
 
 	if (readfileA.is_open()) {
 
-		while (i < (MAX_LIST_ITEMS + 1)) {
-			readfileA >> CoreStruct->pOffsetArray[i];
+		readfileA >> pOffsetList[0];
+		i++;
+
+		while (i <= *pOffsetList) {
+			readfileA >> pOffsetList[i];
 			i++;
 		};
 		readfileA.close();
-
 	}
-	else MessageBoxA(NULL, "Failed to find 'DS3RandomAoB.txt'", "Load Error", MB_ICONWARNING);
+	else MessageBoxA(NULL, "Failed to find 'Data_Item_Order.txt'", "Load Error", MB_ICONWARNING);
 
 	i = 1;
 
 	if (readfileB.is_open()) {
 
-		while (i < (MAX_LIST_ITEMS + 1)) {
-			readfileB >> std::hex >> CoreStruct->pItemArray[i];
+		while (i <= *pOffsetList) {
+			readfileB >> std::hex >> pItemList[i];
 			i++;
 		};
 		readfileB.close();
 		return true;
 	};
 
-	MessageBoxA(NULL, "Failed to find 'DS3ItemAoB.txt'", "Load Error", MB_ICONWARNING);
+	MessageBoxA(NULL, "Failed to find 'Data_Item_List.txt'", "Load Error", MB_ICONWARNING);
 
 	return false;
 };
 
 BOOL CCore::SaveArrayList() {
 
-	int i = 0;
+	DWORD i = 0;
 
-	std::ofstream outfile("DS3RandomAoB.txt");
+	std::ofstream outfile("Data_Item_Order.txt");
+
+	DWORD* pOffsetList = CoreStruct->pOffsetArray;
+	DWORD* pItemList = CoreStruct->pItemArray;
 
 	if (outfile.is_open()) {
 
-		while (i < (MAX_LIST_ITEMS + 1)) {
-			outfile << CoreStruct->pOffsetArray[i] << std::endl;
+		while (i <= *pOffsetList) {
+			outfile << pOffsetList[i] << std::endl;
 			i++;
 		};
 		outfile.close();
@@ -187,7 +196,7 @@ BOOL CCore::SaveArrayList() {
 	};
 
 	CoreStruct->dIsAutoSave = 0;
-	MessageBoxA(NULL, "Failed to find 'DS3RandomAoB.txt'", "Save Error", MB_ICONWARNING);
+	MessageBoxA(NULL, "Failed to find 'Data_Item_Order.txt'", "Save Error", MB_ICONWARNING);
 
 
 	return false;
