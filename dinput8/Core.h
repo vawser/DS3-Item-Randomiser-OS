@@ -26,6 +26,10 @@
 
 #define MAX_LIST_ITEMS 3000
 
+#define ITEM_EMBER 0x400001F4
+#define ITEM_ESTUS_SHARD 0x4000085D
+#define ITEM_UNDEAD_BONE_SHARD 0x4000085F
+
 struct SCore;
 struct SEquipBuffer;
 
@@ -43,7 +47,6 @@ public:
 	virtual BOOL Hook(DWORD64 qAddress, DWORD64 qDetour, DWORD64* pReturn, DWORD dByteLen);
 	virtual VOID Panic(char* pMessage, char* pSort, DWORD dError, DWORD dIsFatalError);
 	virtual VOID DebugInit();
-	virtual VOID DisplayInfoMsg();
 	virtual VOID LockEquipSlots();
 	fDisplayInfoMsg* DisplayEquipLockMsg; //0x14075BC70
 private:
@@ -57,6 +60,7 @@ public:
 	virtual BOOL IsGameProgressionItem(DWORD dItemID);
 	virtual BOOL IsWeaponSpecialType(DWORD dItemID);
 	virtual BOOL IsRestrictedGoods(DWORD dItemID);
+	virtual BOOL IsPlusRing(DWORD dItemID);
 	virtual DWORD RandomiseNumber(DWORD dMin, DWORD dMax);
 	virtual VOID DebugItemPrint(DWORD dOldItem, DWORD dOldQuantity, DWORD dItem, DWORD dQuantity);
 };
@@ -75,12 +79,13 @@ public:
 struct SCore {
 	DWORD dIsDebug;
 	DWORD dIsAutoSave;
-	DWORD dRandomsieHealItems;
+	DWORD dRandomiseEstusShards;
+	DWORD dRandomiseBoneShards;
 	DWORD dRandomiseKeyItems;
+	DWORD dDisallowPlusRings;
 	DWORD dIsAutoEquip;
 	DWORD dLockEquipSlots;
 	DWORD dIsNoWeaponRequirements;
-	DWORD dIsMessageActive;
 	DWORD dIsListChanged;
 	UINT_PTR qLocalPlayer = 0x144740178;
 	UINT_PTR qWorldChrMan = 0x144768E78;

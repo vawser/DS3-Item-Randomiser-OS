@@ -59,10 +59,6 @@ VOID CCore::Run() {
 		CoreStruct->dIsListChanged--;
 	};
 
-	if (CoreStruct->dIsMessageActive) {
-		DisplayInfoMsg();
-	};
-
 	return;
 };
 
@@ -81,9 +77,11 @@ BOOL CCore::Initialise() {
 	if (MH_Initialize() != MH_OK) return false;
 
 	CoreStruct->dIsAutoSave = reader.GetBoolean("Randomiser", "SaveProgress", true);
-	CoreStruct->dRandomsieHealItems = reader.GetBoolean("Randomiser", "RandomiseHeals", true);
+	CoreStruct->dRandomiseEstusShards = reader.GetBoolean("Randomiser", "RandomiseEstusShards", true);
+	CoreStruct->dRandomiseBoneShards = reader.GetBoolean("Randomiser", "RandomiseBoneShards", true);
 	CoreStruct->dRandomiseKeyItems = reader.GetBoolean("Randomiser", "RandomiseKeys ", false);
-	CoreStruct->dIsMessageActive = reader.GetBoolean("Randomiser", "RandomiserMessage", true);
+	CoreStruct->dDisallowPlusRings = reader.GetBoolean("Randomiser", "DisallowPlusRings ", true);
+
 	CoreStruct->dIsAutoEquip = reader.GetBoolean("AutoEquip", "AutoEquipToggle", true);
 	CoreStruct->dLockEquipSlots = reader.GetBoolean("AutoEquip", "LockEquipSlots", false);
 	CoreStruct->dIsNoWeaponRequirements = reader.GetBoolean("AutoEquip", "NoWeaponRequirements", false);
@@ -99,12 +97,15 @@ BOOL CCore::Initialise() {
 #ifdef DEBUG
 	sprintf_s(pBuffer, "[Randomiser] - SaveProgress = %i\n", CoreStruct->dIsAutoSave);
 	printf_s(pBuffer);
-	sprintf_s(pBuffer, "[Randomiser] - RandomiseHeals = %i\n", CoreStruct->dRandomsieHealItems);
+	sprintf_s(pBuffer, "[Randomiser] - RandomiseEstusShards = %i\n", CoreStruct->dRandomiseEstusShards);
+	printf_s(pBuffer);
+	sprintf_s(pBuffer, "[Randomiser] - RandomiseBoneShards = %i\n", CoreStruct->dRandomiseBoneShards);
 	printf_s(pBuffer);
 	sprintf_s(pBuffer, "[Randomiser] - RandomiseKeys = %i\n", CoreStruct->dRandomiseKeyItems);
 	printf_s(pBuffer);
-	sprintf_s(pBuffer, "[Randomiser] - RandomsierMessage = %i\n", CoreStruct->dIsMessageActive);
+	sprintf_s(pBuffer, "[Randomiser] - DisallowPlusRings = %i\n", CoreStruct->dDisallowPlusRings);
 	printf_s(pBuffer);
+
 	sprintf_s(pBuffer, "[AutoEquip] - AutoEquipToggle = %i\n", CoreStruct->dIsAutoEquip);
 	printf_s(pBuffer);
 	sprintf_s(pBuffer, "[AutoEquip] - LockEquipSlots = %i\n", CoreStruct->dLockEquipSlots);
@@ -241,31 +242,6 @@ VOID CCore::Panic(char* pMessage, char* pSort, DWORD dError, DWORD dIsFatalError
 	};
 
 	if (dIsFatalError) *(int*)0 = 0;
-
-	return;
-};
-
-VOID CCore::DisplayInfoMsg() {
-	/*
-	UINT_PTR qLuaEvent = 0;
-	UINT_PTR qWorldChrMan = 0;
-
-	qLuaEvent = *(UINT_PTR*)CoreStruct->qSprjLuaEvent;
-	if (!qLuaEvent) return;
-
-	qWorldChrMan = *(UINT_PTR*)CoreStruct->qWorldChrMan;
-	if (!qWorldChrMan) return;
-	qWorldChrMan = *(UINT_PTR*)(qWorldChrMan + 0x80);
-	if (!qWorldChrMan) return;
-
-	if (!Core->DisplayGraveMessage) {
-		Core->Panic("Bad function call", "...\\Source\\Core\\Core.cpp", FE_BadFunc, 1);
-		int3
-	};
-
-	Core->DisplayGraveMessage(0x33333333);
-	*/
-	CoreStruct->dIsMessageActive = 0;
 
 	return;
 };
