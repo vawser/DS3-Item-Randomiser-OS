@@ -139,7 +139,7 @@ VOID CItemRandomiser::SortNewItem(DWORD* dItem, DWORD* dQuantity) {
 		};
 
 		*dItem += RandomiseNumber(0, bPlayerUpgradeLevel);
-		*dItem += (RandomiseNumber(0, 15) * 100);
+		*dItem += (RandomiseNumber(0, 14) * 100);
 	
 		return;
 	
@@ -285,6 +285,8 @@ extern DWORD pProgressionItems[50] = {
 	0x400007DB,
 	0x400007DD,
 	0x400001EA,
+	0x40000097,
+	0x400000BF,
 	0x00000000
 };
 
@@ -503,6 +505,8 @@ extern DWORD pLimitedItems[250] = {
 	0x403A1718,
 	0x403A26B8,
 	0x403A2AA0,
+	0x40000097,
+	0x400000BF,
 	0x00000000
 };
 
