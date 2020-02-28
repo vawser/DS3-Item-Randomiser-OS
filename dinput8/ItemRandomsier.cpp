@@ -6,7 +6,10 @@ extern SCore* CoreStruct;
 DWORD pProgressionItems[50];
 DWORD pLimitedItems[250];
 DWORD pSpecialWeapons[300];
-DWORD pPlusRings[150];
+DWORD pPlusRings[200];
+DWORD pConsumables[200];
+DWORD pConsumablesMax = 151;
+char pBuffer[MAX_PATH];
 
 VOID fItemRandomiser(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer, UINT_PTR pItemData, DWORD64 qReturnAddress) {
 
@@ -42,41 +45,64 @@ VOID CItemRandomiser::RandomiseItem(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer,
 		dOffsetMax = *pOffsetArray;
 		pOffsetArray++;
 
-		// Handle randomisation toggles
-		if (!CoreStruct->dRandomiseKeyItems) { //User preference "RandomiseKeys"
+		if (!CoreStruct->dRandomiseKeyItems) { 
 			if (IsGameProgressionItem(dItemID)) return;
 		};
-		if (!CoreStruct->dDisallowPlusRings) { //User preference "DisallowPlusRings"
+		if (!CoreStruct->dAllowPlusRings) { 
 			if (IsPlusRing(dItemID)) return;
 		};
-		if (!CoreStruct->dRandomiseEstusShards) { //User preference "RandomiseEstusShards"
+		if (!CoreStruct->dRandomiseEstusShards) { 
 			if ((dItemID == ITEM_ESTUS_SHARD)) return;
 		};
-		if (!CoreStruct->dRandomiseBoneShards) { //User preference "RandomiseBoneShards"
+		if (!CoreStruct->dRandomiseBoneShards) { 
 			if ((dItemID == ITEM_UNDEAD_BONE_SHARD)) return;
 		};
 
 		if (CoreStruct->pItemArray[0] < dOffsetMax) {
-			dItemID = CoreStruct->pItemArray[pOffsetArray[CoreStruct->pItemArray[0]]]; //Grab new item
+			dItemID = CoreStruct->pItemArray[pOffsetArray[CoreStruct->pItemArray[0]]];
 			pOffsetArray[CoreStruct->pItemArray[0]] = 0;
-		} 
+		}
 		else {
-			dItemID = CoreStruct->pItemArray[RandomiseNumber(1, dOffsetMax)]; //Default to random item list
+			dItemID = CoreStruct->pItemArray[RandomiseNumber(1, dOffsetMax)];
 		};
 
 		CoreStruct->pItemArray[0]++;
 
 		SortNewItem(&dItemID, &dItemQuantity);
 
-		// Replace Estus Shard / Bone Shard if randomisation is allowed
 		if ((dItemID == ITEM_ESTUS_SHARD) || (dItemID == ITEM_UNDEAD_BONE_SHARD)) {
-			if (!CoreStruct->dRandomiseEstusShards) dItemID = ITEM_EMBER;
-			if (!CoreStruct->dRandomiseBoneShards) dItemID = ITEM_EMBER;
+			if (!CoreStruct->dRandomiseEstusShards) {
+				if (CoreStruct->dShowDebugPrint) {
+					sprintf_s(pBuffer, "[Debug] - Randomise Estus Shard\n");
+					printf_s(pBuffer);
+				}
+				dItemID = pConsumables[RandomiseNumber(0, pConsumablesMax)];
+			}
+			if (!CoreStruct->dRandomiseBoneShards) {
+				if (CoreStruct->dShowDebugPrint) {
+					sprintf_s(pBuffer, "[Debug] - Randomise Undead Bone Shard\n");
+					printf_s(pBuffer);
+				}
+				dItemID = pConsumables[RandomiseNumber(0, pConsumablesMax)];
+			}
 		};
-
-		// Replace key items if randomisation is allowed
 		if (!CoreStruct->dRandomiseKeyItems) {
-			if (IsGameProgressionItem(dItemID)) dItemID = ITEM_EMBER;
+			if (IsGameProgressionItem(dItemID)) {
+				if (CoreStruct->dShowDebugPrint) {
+					sprintf_s(pBuffer, "[Debug] - Randomise Key Item\n");
+					printf_s(pBuffer);
+				}
+				dItemID = pConsumables[RandomiseNumber(0, pConsumablesMax)];
+			}
+		};
+		if (!CoreStruct->dAllowPlusRings) {
+			if (IsPlusRing(dItemID)) {
+				if (CoreStruct->dShowDebugPrint) {
+					sprintf_s(pBuffer, "[Debug] - Randomise Plus Ring\n");
+					printf_s(pBuffer);
+				}
+				dItemID = pConsumables[RandomiseNumber(0, pConsumablesMax)];
+			}
 		};
 
 		DebugItemPrint(*(int*)(pItemBuffer), *(int*)(pItemBuffer + 0x04), dItemID, dItemQuantity);
@@ -105,7 +131,7 @@ VOID CItemRandomiser::SortNewItem(DWORD* dItem, DWORD* dQuantity) {
 	
 	if (!*dItem) {
 		Core->Panic("No item", "...\\Source\\ItemRandomiser\\ItemRandomiser.cpp", HE_InvalidItemType, 0);
-		*dItem = ITEM_EMBER;
+		*dItem = pConsumables[RandomiseNumber(0, pConsumablesMax)];
 		*dQuantity = 1;
 		return;
 	};
@@ -124,22 +150,23 @@ VOID CItemRandomiser::SortNewItem(DWORD* dItem, DWORD* dQuantity) {
 			return;
 		};
 
-		if (*dItem == 0x000A87500) return; //Dark Hand
-
 		pPlayerPointer = *(UINT_PTR*)(CoreStruct->qLocalPlayer);
 		pPlayerPointer = *(UINT_PTR*)(pPlayerPointer + 0x10);
-		bPlayerUpgradeLevel = *(BYTE*)(pPlayerPointer + 0xB3);
+		bPlayerUpgradeLevel = *(BYTE*)(pPlayerPointer + 0xB3); // Get current upgrade level
 
 		if (!bPlayerUpgradeLevel) return;
 
+		// If weapon is +10 max upgrade
 		if (IsWeaponSpecialType(*dItem)) {
 			bPlayerUpgradeLevel >>= 1;
-			*dItem += RandomiseNumber(0, bPlayerUpgradeLevel);
+			*dItem += RandomiseNumber(0, bPlayerUpgradeLevel); // Reinforcement
+			*dItem += (RandomiseNumber(0, 14) * 100); // Infusion
 			return;
 		};
 
-		*dItem += RandomiseNumber(0, bPlayerUpgradeLevel);
-		*dItem += (RandomiseNumber(0, 14) * 100);
+		// Otherwise, treat as +15 max upgrade
+		*dItem += RandomiseNumber(0, bPlayerUpgradeLevel); // Reinforcement
+		*dItem += (RandomiseNumber(0, 14) * 100); // Infusion
 	
 		return;
 	
@@ -154,7 +181,11 @@ VOID CItemRandomiser::SortNewItem(DWORD* dItem, DWORD* dQuantity) {
 	};
 	case(ItemType_Goods): {
 		*dQuantity = 1;
+
+		// Limit restricted items to 1
 		if (IsRestrictedGoods(*dItem)) return;
+
+		// Otherwise randomise quantity
 		*dQuantity = RandomiseNumber(1, 10);
 		return;
 	};
@@ -768,7 +799,7 @@ extern DWORD pSpecialWeapons[300] = {
 	0x00000000
 };
 
-extern DWORD pPlusRings[150] = {
+extern DWORD pPlusRings[200] = {
 	0x20004E21,
 	0x20004E22,
 	0x20004E23,
@@ -904,4 +935,159 @@ extern DWORD pPlusRings[150] = {
 	0x200077ED,
 	0x200077EE,
 	0x200077EF
+};
+
+extern DWORD pConsumables[200] = {
+	0x400000F0,
+	0x400000F1,
+	0x40000104,
+	0x40000105,
+	0x40000106,
+	0x4000010E,
+	0x4000010F,
+	0x40000110,
+	0x40000112,
+	0x40000113,
+	0x40000114,
+	0x40000118,
+	0x40000122,
+	0x40000124,
+	0x40000125,
+	0x40000126,
+	0x40000128,
+	0x40000129,
+	0x4000012B,
+	0x4000012C,
+	0x4000012E,
+	0x4000012F,
+	0x40000130,
+	0x40000136,
+	0x40000137,
+	0x4000014A,
+	0x4000014B,
+	0x4000014E,
+	0x4000014F,
+	0x40000150,
+	0x40000154,
+	0x40000155,
+	0x40000157,
+	0x40000158,
+	0x4000015E,
+	0x4000016E,
+	0x4000016F,
+	0x40000170,
+	0x40000171,
+	0x40000172,
+	0x40000174,
+	0x40000175,
+	0x40000176,
+	0x40000177,
+	0x40000898,
+	0x40000899,
+	0x40000BB8,
+	0x40000BB9,
+	0x40000BBC,
+	0x40000BBD,
+	0x40000BCA,
+	0x40000BCB,
+	0x40000BCC,
+	0x40000BCD,
+	0x40000BCE,
+	0x40000BCF,
+	0x40000BD0,
+	0x40000FA0,
+	0x40000FA1,
+	0x40000FA2,
+	0x40000FA3,
+	0x40000FA4,
+	0x40000FA5,
+	0x40000FA6,
+	0x40000FA7,
+	0x40000FA8,
+	0x40000FA9,
+	0x40000FAA,
+	0x40000FAB,
+	0x40000FAC,
+	0x40000FAD,
+	0x40000FAE,
+	0x40000FAF,
+	0x40000FB0,
+	0x40000FB1,
+	0x40000FB2,
+	0x40000FB3,
+	0x40000870,
+	0x40000871,
+	0x40000872,
+	0x40000873,
+	0x40000874,
+	0x400003E8,
+	0x400003E9,
+	0x400003EA,
+	0x400003EB,
+	0x400003F2,
+	0x400003FC,
+	0x40000406,
+	0x40000424,
+	0x400004E2,
+	0x400002C8,
+	0x400002C9,
+	0x400002CA,
+	0x400002CB,
+	0x400002CD,
+	0x400002CE,
+	0x400002CF,
+	0x400002D0,
+	0x400002D1,
+	0x400002D2,
+	0x400002D3,
+	0x400002D4,
+	0x400002D5,
+	0x400002D6,
+	0x400002D7,
+	0x400002D8,
+	0x400002D9,
+	0x400002DB,
+	0x400002DC,
+	0x400002DD,
+	0x400002E3,
+	0x400002E6,
+	0x400002E7,
+	0x400002EC,
+	0x400001F4,
+	0x400001C4,
+	0x400001C5,
+	0x400001C6,
+	0x400001C7,
+	0x400001C8,
+	0x400001C9,
+	0x400001CA,
+	0x400001CB,
+	0x400001CC,
+	0x400001CD,
+	0x400001CE,
+	0x400001CF,
+	0x40000186,
+	0x40000190,
+	0x40000191,
+	0x40000192,
+	0x40000193,
+	0x40000194,
+	0x40000195,
+	0x40000196,
+	0x40000197,
+	0x40000198,
+	0x40000199,
+	0x4000019A,
+	0x4000019B,
+	0x4000019C,
+	0x4000019D,
+	0x4000019E,
+	0x4000019F,
+	0x400001A0,
+	0x400001A1,
+	0x400001A2,
+	0x400001A3,
+	0x400001A4,
+	0x400001B8,
+	0x4000017C
 };

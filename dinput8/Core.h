@@ -82,7 +82,8 @@ struct SCore {
 	DWORD dRandomiseEstusShards;
 	DWORD dRandomiseBoneShards;
 	DWORD dRandomiseKeyItems;
-	DWORD dDisallowPlusRings;
+	DWORD dAllowPlusRings;
+	DWORD dShowDebugPrint;
 	DWORD dIsAutoEquip;
 	DWORD dLockEquipSlots;
 	DWORD dIsNoWeaponRequirements;

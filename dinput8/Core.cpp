@@ -80,11 +80,13 @@ BOOL CCore::Initialise() {
 	CoreStruct->dRandomiseEstusShards = reader.GetBoolean("Randomiser", "RandomiseEstusShards", true);
 	CoreStruct->dRandomiseBoneShards = reader.GetBoolean("Randomiser", "RandomiseBoneShards", true);
 	CoreStruct->dRandomiseKeyItems = reader.GetBoolean("Randomiser", "RandomiseKeys ", false);
-	CoreStruct->dDisallowPlusRings = reader.GetBoolean("Randomiser", "DisallowPlusRings ", true);
+	CoreStruct->dAllowPlusRings = reader.GetBoolean("Randomiser", "AllowPlusRings ", false);
 
 	CoreStruct->dIsAutoEquip = reader.GetBoolean("AutoEquip", "AutoEquipToggle", true);
 	CoreStruct->dLockEquipSlots = reader.GetBoolean("AutoEquip", "LockEquipSlots", false);
 	CoreStruct->dIsNoWeaponRequirements = reader.GetBoolean("AutoEquip", "NoWeaponRequirements", false);
+
+	CoreStruct->dShowDebugPrint = reader.GetBoolean("Debug", "ShowDebugPrint", false);
 
 	CoreStruct->pOffsetArray = (DWORD*)HeapAlloc(CoreStruct->hHeap, 8, 0x3000);
 	CoreStruct->pItemArray = (DWORD*)HeapAlloc(CoreStruct->hHeap, 8, 0x3000);
@@ -103,7 +105,7 @@ BOOL CCore::Initialise() {
 	printf_s(pBuffer);
 	sprintf_s(pBuffer, "[Randomiser] - RandomiseKeys = %i\n", CoreStruct->dRandomiseKeyItems);
 	printf_s(pBuffer);
-	sprintf_s(pBuffer, "[Randomiser] - DisallowPlusRings = %i\n", CoreStruct->dDisallowPlusRings);
+	sprintf_s(pBuffer, "[Randomiser] - AllowPlusRings = %i\n", CoreStruct->dAllowPlusRings);
 	printf_s(pBuffer);
 
 	sprintf_s(pBuffer, "[AutoEquip] - AutoEquipToggle = %i\n", CoreStruct->dIsAutoEquip);
@@ -111,6 +113,9 @@ BOOL CCore::Initialise() {
 	sprintf_s(pBuffer, "[AutoEquip] - LockEquipSlots = %i\n", CoreStruct->dLockEquipSlots);
 	printf_s(pBuffer);
 	sprintf_s(pBuffer, "[AutoEquip] - NoWeaponRequirements = %i\n", CoreStruct->dIsNoWeaponRequirements);
+	printf_s(pBuffer);
+
+	sprintf_s(pBuffer, "[Debug] - ShowDebugPrint = %i\n", CoreStruct->dShowDebugPrint);
 	printf_s(pBuffer);
 #endif
 
@@ -143,7 +148,7 @@ BOOL CCore::GetArrayList() {
 
 	std::ifstream readfileA("Data_Item_Order.txt");
 	std::ifstream readfileB("Data_Item_List.txt");
-
+	
 	DWORD* pOffsetList = CoreStruct->pOffsetArray;
 	DWORD* pItemList = CoreStruct->pItemArray;
 
@@ -170,9 +175,8 @@ BOOL CCore::GetArrayList() {
 		};
 		readfileB.close();
 		return true;
-	};
-
-	MessageBoxA(NULL, "Failed to find 'Data_Item_List.txt'", "Load Error", MB_ICONWARNING);
+	}
+	else MessageBoxA(NULL, "Failed to find 'Data_Item_List.txt'", "Load Error", MB_ICONWARNING);
 
 	return false;
 };
