@@ -58,9 +58,10 @@ public:
 	virtual VOID RandomiseItem(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer, UINT_PTR pItemData, DWORD64 qReturnAddress);
 	virtual VOID SortNewItem(DWORD* dItem, DWORD* dQuantity);
 	virtual BOOL IsGameProgressionItem(DWORD dItemID);
-	virtual BOOL IsWeaponSpecialType(DWORD dItemID);
 	virtual BOOL IsRestrictedGoods(DWORD dItemID);
 	virtual BOOL IsPlusRing(DWORD dItemID);
+	virtual BOOL IsUninfusableWeapon(DWORD dItemID);
+	virtual BOOL IsShield(DWORD dItemID);
 	virtual DWORD RandomiseNumber(DWORD dMin, DWORD dMax);
 	virtual VOID DebugItemPrint(DWORD dOldItem, DWORD dOldQuantity, DWORD dItem, DWORD dQuantity);
 };

@@ -5,10 +5,11 @@ extern CItemRandomiser *ItemRandomiser;
 extern SCore* CoreStruct;
 DWORD pProgressionItems[50];
 DWORD pLimitedItems[250];
-DWORD pSpecialWeapons[300];
 DWORD pPlusRings[200];
 DWORD pConsumables[200];
 DWORD pConsumablesMax = 151;
+DWORD pUninfusableWeapons[200];
+DWORD pShields[200];
 char pBuffer[MAX_PATH];
 
 VOID fItemRandomiser(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer, UINT_PTR pItemData, DWORD64 qReturnAddress) {
@@ -156,18 +157,51 @@ VOID CItemRandomiser::SortNewItem(DWORD* dItem, DWORD* dQuantity) {
 
 		if (!bPlayerUpgradeLevel) return;
 
-		// If weapon is +10 max upgrade
-		if (IsWeaponSpecialType(*dItem)) {
-			bPlayerUpgradeLevel >>= 1;
-			*dItem += RandomiseNumber(0, bPlayerUpgradeLevel); // Reinforcement
-			*dItem += (RandomiseNumber(0, 14) * 100); // Infusion
-			return;
-		};
-
-		// Otherwise, treat as +15 max upgrade
-		*dItem += RandomiseNumber(0, bPlayerUpgradeLevel); // Reinforcement
-		*dItem += (RandomiseNumber(0, 14) * 100); // Infusion
-	
+		// Handle uninfusables separately
+		if (IsUninfusableWeapon(*dItem)) {
+			// Weapons
+			if (!IsShield(*dItem)) {
+				if (bPlayerUpgradeLevel < 5) {
+					*dItem += RandomiseNumber(0, bPlayerUpgradeLevel); // Reinforcement
+				}
+				else {
+					*dItem += bPlayerUpgradeLevel; // Reinforcement
+				}
+			}
+			// Shields
+			else {
+				if (bPlayerUpgradeLevel < 5) {
+					*dItem += RandomiseNumber(0, bPlayerUpgradeLevel); // Reinforcement
+				}
+				else {
+					*dItem += bPlayerUpgradeLevel; // Reinforcement
+				}
+			}
+		}
+		else {
+			// Weapons
+			if (!IsShield(*dItem)) {
+				if (bPlayerUpgradeLevel < 5) {
+					*dItem += RandomiseNumber(0, bPlayerUpgradeLevel); // Reinforcement
+					*dItem += (RandomiseNumber(0, 14) * 100); // Infusion
+				}
+				else {
+					*dItem += bPlayerUpgradeLevel; // Reinforcement
+					*dItem += (RandomiseNumber(0, 14) * 100); // Infusion
+				}
+			}
+			// Shields
+			else {
+				if (bPlayerUpgradeLevel < 5) {
+					*dItem += RandomiseNumber(0, bPlayerUpgradeLevel); // Reinforcement
+					*dItem += (RandomiseNumber(0, 10) * 100); // Infusion
+				}
+				else {
+					*dItem += bPlayerUpgradeLevel; // Reinforcement
+					*dItem += (RandomiseNumber(0, 10) * 100); // Infusion
+				}
+			}
+		}
 		return;
 	
 	};
@@ -212,18 +246,6 @@ BOOL CItemRandomiser::IsGameProgressionItem(DWORD dItemID) {
 	return false;
 };
 
-BOOL CItemRandomiser::IsWeaponSpecialType(DWORD dItemID) {
-
-	int i = 0;
-
-	while (pSpecialWeapons[i]) {
-		if (dItemID == pSpecialWeapons[i]) return true;
-		i++;
-	};
-
-	return false;
-};
-
 BOOL CItemRandomiser::IsRestrictedGoods(DWORD dItemID) {
 
 	int i = 0;
@@ -242,6 +264,30 @@ BOOL CItemRandomiser::IsPlusRing(DWORD dItemID) {
 
 	while (pPlusRings[i]) {
 		if (dItemID == pPlusRings[i]) return true;
+		i++;
+	};
+
+	return false;
+};
+
+BOOL CItemRandomiser::IsUninfusableWeapon(DWORD dItemID) {
+
+	int i = 0;
+
+	while (pUninfusableWeapons[i]) {
+		if (dItemID == pUninfusableWeapons[i]) return true;
+		i++;
+	};
+
+	return false;
+};
+
+BOOL CItemRandomiser::IsShield(DWORD dItemID) {
+
+	int i = 0;
+
+	while (pShields[i]) {
+		if (dItemID == pShields[i]) return true;
 		i++;
 	};
 
@@ -541,264 +587,6 @@ extern DWORD pLimitedItems[250] = {
 	0x00000000
 };
 
-extern DWORD pSpecialWeapons[300] = {
-	0x000FB770,
-	0x001053B0,
-	0x00107AC0,
-	0x00111700,
-	0x00203230,
-	0x0020A760,
-	0x0020CE70,
-	0x0020F580,
-	0x002143A0,
-	0x002206F0,
-	0x0022A330,
-	0x002E3BF0,
-	0x002E6300,
-	0x002E8A10,
-	0x002EB120,
-	0x003E4180,
-	0x003E6890,
-	0x003E8FA0,
-	0x004C9960,
-	0x004CC070,
-	0x004CE780,
-	0x004D0E90,
-	0x005BB490,
-	0x005C77E0,
-	0x005D8950,
-	0x005E2590,
-	0x005E4CA0,
-	0x005E9AC0,
-	0x005F0FF0,
-	0x005F3700,
-	0x005F5E10,
-	0x005F8520,
-	0x005FAC30,
-	0x005FD340,
-	0x005FFA50,
-	0x00602160,
-	0x00604870,
-	0x00606F80,
-	0x00609690,
-	0x0060BDA0,
-	0x0060E4B0,
-	0x00610BC0,
-	0x006132D0,
-	0x006B6C00,
-	0x006BE130,
-	0x006C0840,
-	0x006C7D70,
-	0x006CA480,
-	0x006CCB90,
-	0x007CAA10,
-	0x007CD120,
-	0x007CF830,
-	0x007D4650,
-	0x007D6D60,
-	0x007D9470,
-	0x007E09A0,
-	0x007E30B0,
-	0x007E57C0,
-	0x007E7ED0,
-	0x008B01F0,
-	0x008B5010,
-	0x008B7720,
-	0x008BC540,
-	0x008BEC50,
-	0x008C1360,
-	0x008C3A70,
-	0x008CAFA0,
-	0x009959D0,
-	0x0099A7F0,
-	0x009A1D20,
-	0x009A4430,
-	0x009A6B40,
-	0x009AE070,
-	0x009B0780,
-	0x00A826E0,
-	0x00A84DF0,
-	0x00A87500,
-	0x00B7B740,
-	0x00B916D0,
-	0x00B93DE0,
-	0x00B964F0,
-	0x00B98C00,
-	0x00B9B310,
-	0x00B9DA20,
-	0x00BA0130,
-	0x00C7E3E0,
-	0x00C80AF0,
-	0x00C83200,
-	0x00C88020,
-	0x00C8CE40,
-	0x00C91C60,
-	0x00C94370,
-	0x00C96A80,
-	0x00C9DFB0,
-	0x00CA06C0,
-	0x00CA2DD0,
-	0x00CA54E0,
-	0x00CAA300,
-	0x00CAF120,
-	0x00CC77C0,
-	0x00CD3B10,
-	0x00CD6220,
-	0x00CDFE60,
-	0x00CE2570,
-	0x00CE4C80,
-	0x00CE7390,
-	0x00CE9AA0,
-	0x00CEC1B0,
-	0x00CEE8C0,
-	0x00CF0FD0,
-	0x00CF36E0,
-	0x00CF5DF0,
-	0x00CF8500,
-	0x00CFAC10,
-	0x00CFD320,
-	0x00CFFA30,
-	0x00D614B0,
-	0x00D662D0,
-	0x00D6B0F0,
-	0x00D6FF10,
-	0x00D72620,
-	0x00D79B50,
-	0x00D7C260,
-	0x00D7E970,
-	0x00D8ACC0,
-	0x00D8D3D0,
-	0x00F4C040,
-	0x00F55C80,
-	0x013376F0,
-	0x013572C0,
-	0x013599D0,
-	0x014159A0,
-	0x0141F5E0,
-	0x01421CF0,
-	0x01424400,
-	0x01430750,
-	0x01432E60,
-	0x01437C80,
-	0x0143CAA0,
-	0x014466E0,
-	0x0144B500,
-	0x01504DC0,
-	0x015074D0,
-	0x01509BE0,
-	0x0150C2F0,
-	0x01511110,
-	0x01515F30,
-	0x01518640,
-	0x0151FB70,
-	0x01524990,
-	0x015270A0,
-	0x015297B0,
-	0x0152BEC0,
-	0x0152E5D0,
-	0x01530CE0,
-	0x015333F0,
-	0x01535B00,
-	0x01538210,
-	0x0153A920,
-	0x0153D030,
-	0x0153F740,
-	0x01541E50,
-	0x01C9EA90,
-	0x01CA11A0,
-	0x01CA38B0,
-	0x01CA5FC0,
-	0x01CA86D0,
-	0x01CAADE0,
-	0x01CAD4F0,
-	0x01CB2310,
-	0x01CB4A20,
-	0x01CB7130,
-	0x01CBBF50,
-	0x01CBE660,
-	0x01CC5B90,
-	0x01CC82A0,
-	0x01CCD0C0,
-	0x01CD1EE0,
-	0x01CDBB20,
-	0x01CE5760,
-	0x01CE7E70,
-	0x01CEA580,
-	0x01CECC90,
-	0x01CF41C0,
-	0x01CFB6F0,
-	0x01CFDE00,
-	0x01D02C20,
-	0x01D07A40,
-	0x01D0A150,
-	0x01D0EF70,
-	0x01D164A0,
-	0x01D18BB0,
-	0x01D1B2C0,
-	0x01D200E0,
-	0x01D227F0,
-	0x01D24F00,
-	0x01D27610,
-	0x01D29D20,
-	0x01D2C430,
-	0x01D31250,
-	0x01D33960,
-	0x01D36070,
-	0x01D38780,
-	0x01D3AE90,
-	0x01D3FCB0,
-	0x01D423C0,
-	0x01D44AD0,
-	0x01D471E0,
-	0x01D498F0,
-	0x01D4C000,
-	0x01D50E20,
-	0x01D55C40,
-	0x01D58350,
-	0x01D5AA60,
-	0x01D5D170,
-	0x01D5F880,
-	0x01D646A0,
-	0x01D694C0,
-	0x01D6BBD0,
-	0x01D6E2E0,
-	0x01D73100,
-	0x01D75810,
-	0x01D7F450,
-	0x01D84270,
-	0x01D86980,
-	0x01D89090,
-	0x01D8B7A0,
-	0x01D92CD0,
-	0x01D953E0,
-	0x01D97AF0,
-	0x01D9A200,
-	0x01D9C910,
-	0x01D9F020,
-	0x01DA1730,
-	0x01DA6550,
-	0x01DA8C60,
-	0x01DAB370,
-	0x01DB0190,
-	0x01DB28A0,
-	0x01DB4FB0,
-	0x01DB76C0,
-	0x01DB9DD0,
-	0x01DBC4E0,
-	0x01DD99A0,
-	0x01DDC0B0,
-	0x01DDE7C0,
-	0x01DE0ED0,
-	0x01DE35E0,
-	0x01DE5CF0,
-	0x01DE8400,
-	0x01DEAB10,
-	0x01DED220,
-	0x01DEF930,
-	0x01DF2040,
-	0x00000000
-};
-
 extern DWORD pPlusRings[200] = {
 	0x20004E21,
 	0x20004E22,
@@ -1089,5 +877,161 @@ extern DWORD pConsumables[200] = {
 	0x400001A3,
 	0x400001A4,
 	0x400001B8,
-	0x4000017C
+	0x4000017C,
+	0x40000BBA,
+	0x4000041A,
+	0x4000042E,
+	0x40000438,
+	0x40000442
+};
+
+extern DWORD pUninfusableWeapons[200] = {
+	0x00C72090,
+	0x00C747A0,
+	0x00C76EB0,
+	0x00C795C0,
+	0x00C8F550,
+	0x00C99190,
+	0x00C9B8A0,
+	0x00CA7BF0,
+	0x00CACA10,
+	0x00D02140,
+	0x00D04850,
+	0x00D5C690,
+	0x00D5EDA0,
+	0x00D63BC0,
+	0x00D689E0,
+	0x00D74D30,
+	0x00D83790,
+	0x01DADA80,
+	0x00C7E3E0,
+	0x00C80AF0,
+	0x00C83200,
+	0x00C88020,
+	0x00C8CE40,
+	0x00C91C60,
+	0x00C94370,
+	0x00C96A80,
+	0x00C9DFB0,
+	0x00CA06C0,
+	0x00CA2DD0,
+	0x00CA54E0,
+	0x00CAA300,
+	0x00CAF120,
+	0x00CC77C0,
+	0x00CD3B10,
+	0x00CD6220,
+	0x00CDFE60,
+	0x00CE2570,
+	0x00CE4C80,
+	0x00CE7390,
+	0x00CE9AA0,
+	0x00CEC1B0,
+	0x00CEE8C0,
+	0x00CF0FD0,
+	0x00CF36E0,
+	0x00CF5DF0,
+	0x00CF8500,
+	0x00CFAC10,
+	0x00CFD320,
+	0x00CFFA30,
+	0x00D614B0,
+	0x00D662D0,
+	0x00D6B0F0,
+	0x00D6FF10,
+	0x00D72620,
+	0x00D79B50,
+	0x00D7C260,
+	0x00D7E970,
+	0x00D8ACC0,
+	0x00D8D3D0,
+	0x009B55A0,
+	0x00CC9ED0,
+	0x00CCC5E0,
+	0x00D885B0,
+	0x00D77440
+};
+
+extern DWORD pShields[200] = {
+	0x01312D00,
+	0x01315410,
+	0x0131A230,
+	0x0131C940,
+	0x01323E70,
+	0x01326580,
+	0x0132DAB0,
+	0x013301C0,
+	0x013328D0,
+	0x01339E00,
+	0x0133C510,
+	0x0133EC20,
+	0x01341330,
+	0x01343A40,
+	0x01346150,
+	0x01348860,
+	0x0134AF70,
+	0x0134D680,
+	0x0134FD90,
+	0x013524A0,
+	0x01354BB0,
+	0x01409650,
+	0x01410B80,
+	0x014180B0,
+	0x01426B10,
+	0x01429220,
+	0x0142B930,
+	0x0142E040,
+	0x01435570,
+	0x0143A390,
+	0x0143F1B0,
+	0x014418C0,
+	0x01443FD0,
+	0x01448DF0,
+	0x0144DC10,
+	0x014FD890,
+	0x014FFFA0,
+	0x0150EA00,
+	0x01513820,
+	0x0151AD50,
+	0x0151D460,
+	0x01522280,
+	0x01544560,
+	0x01546C70,
+	0x013376F0,
+	0x013572C0,
+	0x013599D0,
+	0x014159A0,
+	0x0141F5E0,
+	0x01421CF0,
+	0x01424400,
+	0x01430750,
+	0x01432E60,
+	0x01437C80,
+	0x0143CAA0,
+	0x014466E0,
+	0x0144B500,
+	0x01504DC0,
+	0x015074D0,
+	0x01509BE0,
+	0x0150C2F0,
+	0x01511110,
+	0x01515F30,
+	0x01518640,
+	0x0151FB70,
+	0x01524990,
+	0x015270A0,
+	0x015297B0,
+	0x0152BEC0,
+	0x0152E5D0,
+	0x01530CE0,
+	0x015333F0,
+	0x01535B00,
+	0x01538210,
+	0x0153A920,
+	0x0153D030,
+	0x0153F740,
+	0x01541E50,
+	0x0135C0E0,
+	0x01450320,
+	0x01452A30
 };
