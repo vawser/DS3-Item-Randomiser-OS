@@ -77,9 +77,8 @@ BOOL CCore::Initialise() {
 	if (MH_Initialize() != MH_OK) return false;
 
 	CoreStruct->dIsAutoSave = reader.GetBoolean("Randomiser", "SaveProgress", true);
-	CoreStruct->dRandomiseEstusShards = reader.GetBoolean("Randomiser", "RandomiseEstusShards", true);
-	CoreStruct->dRandomiseBoneShards = reader.GetBoolean("Randomiser", "RandomiseBoneShards", true);
-	CoreStruct->dRandomiseKeyItems = reader.GetBoolean("Randomiser", "RandomiseKeys ", false);
+	CoreStruct->dRandomEstusMaterial = reader.GetBoolean("Randomiser", "RandomEstusMaterials", false);
+	CoreStruct->dRandomiseKeyItems = reader.GetBoolean("Randomiser", "RandomKeyItems ", false);
 	CoreStruct->dAllowPlusRings = reader.GetBoolean("Randomiser", "AllowPlusRings ", false);
 
 	CoreStruct->dIsAutoEquip = reader.GetBoolean("AutoEquip", "AutoEquipToggle", true);
@@ -99,11 +98,9 @@ BOOL CCore::Initialise() {
 #ifdef DEBUG
 	sprintf_s(pBuffer, "[Randomiser] - SaveProgress = %i\n", CoreStruct->dIsAutoSave);
 	printf_s(pBuffer);
-	sprintf_s(pBuffer, "[Randomiser] - RandomiseEstusShards = %i\n", CoreStruct->dRandomiseEstusShards);
+	sprintf_s(pBuffer, "[Randomiser] - RandomEstusMaterials = %i\n", CoreStruct->dRandomEstusMaterial);
 	printf_s(pBuffer);
-	sprintf_s(pBuffer, "[Randomiser] - RandomiseBoneShards = %i\n", CoreStruct->dRandomiseBoneShards);
-	printf_s(pBuffer);
-	sprintf_s(pBuffer, "[Randomiser] - RandomiseKeys = %i\n", CoreStruct->dRandomiseKeyItems);
+	sprintf_s(pBuffer, "[Randomiser] - RandomKeyItems = %i\n", CoreStruct->dRandomiseKeyItems);
 	printf_s(pBuffer);
 	sprintf_s(pBuffer, "[Randomiser] - AllowPlusRings = %i\n", CoreStruct->dAllowPlusRings);
 	printf_s(pBuffer);

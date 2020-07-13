@@ -80,8 +80,7 @@ public:
 struct SCore {
 	DWORD dIsDebug;
 	DWORD dIsAutoSave;
-	DWORD dRandomiseEstusShards;
-	DWORD dRandomiseBoneShards;
+	DWORD dRandomEstusMaterial;
 	DWORD dRandomiseKeyItems;
 	DWORD dAllowPlusRings;
 	DWORD dShowDebugPrint;
@@ -119,3 +118,4 @@ extern "C" VOID fAutoEquip(UINT_PTR pItemBuffer, DWORD64 pItemData, DWORD64 qRet
 extern "C" DWORD64 rNoWeaponRequirements;
 extern "C" VOID tNoWeaponRequirements();
 extern "C" VOID fNoWeaponRequirements(DWORD* pRequirementPtr);
+
