@@ -29,6 +29,7 @@
 #define ITEM_EMBER 0x400001F4
 #define ITEM_ESTUS_SHARD 0x4000085D
 #define ITEM_UNDEAD_BONE_SHARD 0x4000085F
+#define ITEM_ASHEN_ESTUS 0x400000BF
 
 struct SCore;
 struct SEquipBuffer;
@@ -57,13 +58,14 @@ class CItemRandomiser {
 public:
 	virtual VOID RandomiseItem(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer, UINT_PTR pItemData, DWORD64 qReturnAddress);
 	virtual VOID SortNewItem(DWORD* dItem, DWORD* dQuantity);
-	virtual BOOL IsGameProgressionItem(DWORD dItemID);
+	virtual BOOL IsKeyGood(DWORD dItemID);
 	virtual BOOL IsRestrictedGoods(DWORD dItemID);
 	virtual BOOL IsPlusRing(DWORD dItemID);
 	virtual BOOL IsUninfusableWeapon(DWORD dItemID);
 	virtual BOOL IsShield(DWORD dItemID);
+	virtual BOOL IsNormalWeapon(DWORD dItemID);
+	virtual BOOL IsSpell(DWORD dItemID);
 	virtual DWORD RandomiseNumber(DWORD dMin, DWORD dMax);
-	virtual VOID DebugItemPrint(DWORD dOldItem, DWORD dOldQuantity, DWORD dItem, DWORD dQuantity);
 };
 
 class CAutoEquip {
@@ -80,17 +82,38 @@ public:
 struct SCore {
 	DWORD dIsDebug;
 	DWORD dIsAutoSave;
+
 	DWORD dRandomEstusMaterial;
-	DWORD dRandomiseKeyItems;
+	DWORD dRandomKeyItems;
 	DWORD dAllowPlusRings;
-	DWORD dShowDebugPrint;
+	DWORD dAllowRandomWeaponReinforcement;
+	DWORD dRandomInfusionsOnWeapons;
+
+	DWORD dGoodsRandomMin;
+	DWORD dGoodsRandomMax;
+	DWORD dScalingReinforcementVariance;
+
 	DWORD dIsAutoEquip;
+	DWORD dAutoEquipWeapon;
+	DWORD dAutoEquipArmor;
+	DWORD dAutoEquipRing;
 	DWORD dLockEquipSlots;
 	DWORD dIsNoWeaponRequirements;
+
 	DWORD dIsListChanged;
-	UINT_PTR qLocalPlayer = 0x144740178;
-	UINT_PTR qWorldChrMan = 0x144768E78;
+
+	UINT_PTR qLocalPlayer = 0x144740178; // Base A
+	UINT_PTR qWorldChrMan = 0x144768E78; // Base B
 	UINT_PTR qSprjLuaEvent = 0x14473A9C8;
+	UINT_PTR qBaseC = 0x144743AB0;
+	UINT_PTR qBaseD = 0x144743A80;
+	UINT_PTR qParam = 0x144782838;
+	UINT_PTR qBaseE = 0x14473FD08;
+	UINT_PTR qBaseF = 0x14473AD78;
+	UINT_PTR qBaseZ = 0x144768F98;
+	UINT_PTR qLockBonus = 0x1408C06A6;
+	UINT_PTR qPickupPtr = 0x13FFA0021;
+
 	HANDLE hHeap;
 	DWORD* pOffsetArray;
 	DWORD* pItemArray;

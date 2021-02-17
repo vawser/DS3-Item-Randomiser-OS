@@ -68,22 +68,40 @@ BOOL CAutoEquip::SortItem(DWORD dItemID, SEquipBuffer* E) {
 
 	switch (dItemType) {
 	case(ItemType_Weapon): {
-		if ((dItemID >> 0x10) == 6) return false; //Don't equip ammo
-		if ((dItemID & 0xFF000000) << 4 != 0x10000000) dEquipSlot = 1; //If these conditions are met, it's a shield.
-		break;
+		if (CoreStruct->dAutoEquipWeapon)
+		{
+			if ((dItemID >> 0x10) == 6) return false; //Don't equip ammo
+			if ((dItemID & 0xFF000000) << 4 != 0x10000000) dEquipSlot = 1; //If these conditions are met, it's a shield.
+			break;
+		}
+		else {
+			return false;
+		}
 	};
 	case(ItemType_Protector): {
-		if (FindEquipType(dItemID, &pArmor_Head[0])) dEquipSlot = 0x0C;
-		else if (FindEquipType(dItemID, &pArmor_Body[0])) dEquipSlot = 0x0D;
-		else if (FindEquipType(dItemID, &pArmor_Hand[0])) dEquipSlot = 0x0E;
-		else if (FindEquipType(dItemID, &pArmor_Leg[0])) dEquipSlot = 0x0F;
-		break;
+		if (CoreStruct->dAutoEquipArmor)
+		{
+			if (FindEquipType(dItemID, &pArmor_Head[0])) dEquipSlot = 0x0C;
+			else if (FindEquipType(dItemID, &pArmor_Body[0])) dEquipSlot = 0x0D;
+			else if (FindEquipType(dItemID, &pArmor_Hand[0])) dEquipSlot = 0x0E;
+			else if (FindEquipType(dItemID, &pArmor_Leg[0])) dEquipSlot = 0x0F;
+			break;
+		}
+		else {
+			return false;
+		}
 	};
 	case(ItemType_Accessory): {
-		if (dRingSlotSelect >= 0x15) dRingSlotSelect = 0x11;
-		dEquipSlot = dRingSlotSelect;
-		dRingSlotSelect++;
-		break;
+		if (CoreStruct->dAutoEquipRing)
+		{
+			if (dRingSlotSelect >= 0x15) dRingSlotSelect = 0x11;
+			dEquipSlot = dRingSlotSelect;
+			dRingSlotSelect++;
+			break;
+		}
+		else {
+			return false;
+		}
 	};
 	case(ItemType_Goods): return false;
 	default: {

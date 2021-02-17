@@ -78,14 +78,22 @@ BOOL CCore::Initialise() {
 
 	CoreStruct->dIsAutoSave = reader.GetBoolean("Randomiser", "SaveProgress", true);
 	CoreStruct->dRandomEstusMaterial = reader.GetBoolean("Randomiser", "RandomEstusMaterials", false);
-	CoreStruct->dRandomiseKeyItems = reader.GetBoolean("Randomiser", "RandomKeyItems ", false);
-	CoreStruct->dAllowPlusRings = reader.GetBoolean("Randomiser", "AllowPlusRings ", false);
+	CoreStruct->dRandomKeyItems = reader.GetBoolean("Randomiser", "RandomKeyItems", false);
+	CoreStruct->dAllowPlusRings = reader.GetBoolean("Randomiser", "AllowPlusRings", false);
+	CoreStruct->dAllowRandomWeaponReinforcement = reader.GetBoolean("Randomiser", "AllowRandomWeaponReinforcement", false);
+	CoreStruct->dRandomInfusionsOnWeapons = reader.GetBoolean("Randomiser", "RandomInfusionsOnWeapons", true);
 
-	CoreStruct->dIsAutoEquip = reader.GetBoolean("AutoEquip", "AutoEquipToggle", true);
+	CoreStruct->dGoodsRandomMin = reader.GetInteger("Values", "GoodsRandomMin", 1);
+	CoreStruct->dGoodsRandomMax = reader.GetInteger("Values", "GoodsRandomMax", 99);
+	CoreStruct->dScalingReinforcementVariance = reader.GetInteger("Values", "ScalingReinforcementVariance", 1);
+	
+	CoreStruct->dIsAutoEquip = reader.GetBoolean("AutoEquip", "AutoEquipToggle", false);
+	CoreStruct->dAutoEquipWeapon = reader.GetBoolean("AutoEquip", "AutoEquipWeapon", false);
+	CoreStruct->dAutoEquipArmor = reader.GetBoolean("AutoEquip", "AutoEquipArmor", false);
+	CoreStruct->dAutoEquipRing = reader.GetBoolean("AutoEquip", "AutoEquipRing", false);
+
 	CoreStruct->dLockEquipSlots = reader.GetBoolean("AutoEquip", "LockEquipSlots", false);
 	CoreStruct->dIsNoWeaponRequirements = reader.GetBoolean("AutoEquip", "NoWeaponRequirements", false);
-
-	CoreStruct->dShowDebugPrint = reader.GetBoolean("Debug", "ShowDebugPrint", false);
 
 	CoreStruct->pOffsetArray = (DWORD*)HeapAlloc(CoreStruct->hHeap, 8, 0x3000);
 	CoreStruct->pItemArray = (DWORD*)HeapAlloc(CoreStruct->hHeap, 8, 0x3000);
@@ -100,19 +108,34 @@ BOOL CCore::Initialise() {
 	printf_s(pBuffer);
 	sprintf_s(pBuffer, "[Randomiser] - RandomEstusMaterials = %i\n", CoreStruct->dRandomEstusMaterial);
 	printf_s(pBuffer);
-	sprintf_s(pBuffer, "[Randomiser] - RandomKeyItems = %i\n", CoreStruct->dRandomiseKeyItems);
+	sprintf_s(pBuffer, "[Randomiser] - RandomKeyItems = %i\n", CoreStruct->dRandomKeyItems);
 	printf_s(pBuffer);
 	sprintf_s(pBuffer, "[Randomiser] - AllowPlusRings = %i\n", CoreStruct->dAllowPlusRings);
+	printf_s(pBuffer);
+	sprintf_s(pBuffer, "[Randomiser] - AllowRandomWeaponReinforcement = %i\n", CoreStruct->dAllowRandomWeaponReinforcement);
+	printf_s(pBuffer);
+	sprintf_s(pBuffer, "[Randomiser] - RandomInfusionsOnWeapons = %i\n", CoreStruct->dRandomInfusionsOnWeapons);
+	printf_s(pBuffer);
+
+
+	sprintf_s(pBuffer, "[Values] - GoodsRandomMin = %i\n", CoreStruct->dGoodsRandomMin);
+	printf_s(pBuffer);
+	sprintf_s(pBuffer, "[Values] - GoodsRandomMax = %i\n", CoreStruct->dGoodsRandomMax);
+	printf_s(pBuffer);
+	sprintf_s(pBuffer, "[Values] - ScalingReinforcementVariance = %i\n", CoreStruct->dScalingReinforcementVariance);
 	printf_s(pBuffer);
 
 	sprintf_s(pBuffer, "[AutoEquip] - AutoEquipToggle = %i\n", CoreStruct->dIsAutoEquip);
 	printf_s(pBuffer);
+	sprintf_s(pBuffer, "[AutoEquip] - AutoEquipWeapon = %i\n", CoreStruct->dAutoEquipWeapon);
+	printf_s(pBuffer);
+	sprintf_s(pBuffer, "[AutoEquip] - AutoEquipArmor = %i\n", CoreStruct->dAutoEquipArmor);
+	printf_s(pBuffer);
+	sprintf_s(pBuffer, "[AutoEquip] - AutoEquipRing = %i\n", CoreStruct->dAutoEquipRing);
+	printf_s(pBuffer);
 	sprintf_s(pBuffer, "[AutoEquip] - LockEquipSlots = %i\n", CoreStruct->dLockEquipSlots);
 	printf_s(pBuffer);
 	sprintf_s(pBuffer, "[AutoEquip] - NoWeaponRequirements = %i\n", CoreStruct->dIsNoWeaponRequirements);
-	printf_s(pBuffer);
-
-	sprintf_s(pBuffer, "[Debug] - ShowDebugPrint = %i\n", CoreStruct->dShowDebugPrint);
 	printf_s(pBuffer);
 #endif
 
